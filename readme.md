@@ -1,43 +1,63 @@
-# AWS Serverless Static Website Infrastructure
+<div align="center">
 
-![Terraform](https://img.shields.io/badge/IaC-Terraform-purple)
-![AWS](https://img.shields.io/badge/Cloud-AWS-232F3E)
-![Security](https://img.shields.io/badge/Security-OIDC%20%2B%20OAC-red)
-![Build](https://img.shields.io/badge/Build-GitHub%20Actions-blue)
+# ☁️ AWS Serverless Static Website Hosting
+### Secure. Automated. Scalable.
+
+![Terraform](https://img.shields.io/badge/IaC-Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![AWS](https://img.shields.io/badge/Cloud-AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+
+<p align="center">
+  <a href="#-project-overview">Overview</a> •
+  <a href="#-architecture">Architecture</a> •
+  <a href="#-setup--deployment-guide">Setup Guide</a> •
+  <a href="#-troubleshooting-common-issues">Troubleshooting</a>
+</p>
+
+</div>
+
+---
 
 ## 📖 Project Overview
 
-This project provisions a secure, serverless static website on AWS using **Terraform** (IaC) and automates deployments via **GitHub Actions**. It enforces **Zero-Trust** principles with private S3 storage, CloudFront for global delivery (OAC secured), and OIDC for passwordless CI/CD authentication.
+This project provisions a secure, enterprise-grade static website infrastructure on AWS using **Terraform** and creates a fully automated CI/CD pipeline with **GitHub Actions**.
 
-# AWS Serverless Static Website Infrastructure
-
-![Terraform](https://img.shields.io/badge/IaC-Terraform-purple)
-![AWS](https://img.shields.io/badge/Cloud-AWS-232F3E)
-![Security](https://img.shields.io/badge/Security-OIDC%20%2B%20OAC-red)
-![Build](https://img.shields.io/badge/Build-GitHub%20Actions-blue)
-
-## 📖 Project Overview
-
-This project provisions a secure, serverless static website on AWS using **Terraform** (IaC) and automates deployments via **GitHub Actions**. It enforces **Zero-Trust** principles with private S3 storage, CloudFront for global delivery (OAC secured), and OIDC for passwordless CI/CD authentication.
+It moves beyond basic hosting by implementing **Zero-Trust security** principles:
+* 🔒 **Private S3 Storage:** The bucket is not public; it is accessed only via CloudFront.
+* 🛡️ **OAC (Origin Access Control):** Ensures only your specific CloudFront distribution can access your data.
+* 🔑 **OIDC Authentication:** Eliminates the need for long-lived AWS Access Keys in GitHub Secrets.
 
 ---
 
 ## 🏗 Architecture
 
-```mermaid
-graph LR
-    User((User)) -->|HTTPS| Route53[Route 53 DNS]
-    Route53 -->|Alias| CloudFront[CloudFront CDN]
-    CloudFront -->|OAC Signed Request| S3[S3 Bucket \n(Private Origin)]
+Since Mermaid diagrams can be inconsistent, here is the visual flow of the infrastructure:
 
-    subgraph "CI/CD Pipeline"
-        Dev[Developer] -->|Push Code| GitHub[GitHub Actions]
-        GitHub -->|OIDC Auth| AWS[AWS IAM]
-        AWS -->|Sync Files| S3
-        AWS -->|Invalidate Cache| CloudFront
-    end
+```text
+                                  🌐 Public Internet
+                                         │
+                                         ▼
+                                [ 🚦 Route 53 DNS ]
+                                         │
+                                         ▼
+                               [ ⚡ CloudFront CDN ]
+                                 (Edge Locations)
+                                         │
+                                         │ (Signed Request via OAC)
+                                         ▼
+    ┌──────────────────────────────────────────────────────────────────┐
+    │  ☁️ AWS Cloud                                                    │
+    │                                                                  │
+    │   [ 🔒 S3 Bucket (Private Origin) ] ◀───┐                        │
+    │       (Stores HTML/CSS/JS)              │                        │
+    │                                         │ (Sync Files)           │
+    └─────────────────────────────────────────┼────────────────────────┘
+                                              │
+                                              │
+                                     [ 🐙 GitHub Actions ]
+                                     (Build & Deploy Pipeline)
 ```
-
 ---
 
 ## 🛠 Tech Stack
@@ -59,16 +79,15 @@ graph LR
 ```bash
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml   # CI/CD Pipeline logic
-├── terraform/           # <--- Infrastructure Code lives here
+│       └── deploy.yml   # 🤖 CI/CD Pipeline logic
+├── terraform/           # 🏗️ Infrastructure Code
 │   ├── main.tf          # Core resources (S3, CloudFront, Route53)
-│   ├── iam.tf           # OIDC Trust & Roles for GitHub
-│   ├── providers.tf     # AWS Providers (inc. us-east-1 alias)
-│   ├── variables.tf     # Dynamic configuration variables
-│   └── outputs.tf       # Resource ARNs and IDs
-└── website/             # <--- Your HTML/CSS files go here
+│   ├── iam.tf           # OIDC Trust Policy & Roles
+│   ├── providers.tf     # AWS Provider config
+│   ├── variables.tf     # Custom configuration
+│   └── outputs.tf       # Resource IDs (needed for CI/CD)
+└── website/             # 🌐 The actual website content
     └── index.html
-
 ```
 
 ---
