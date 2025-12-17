@@ -47,9 +47,9 @@ Since Mermaid diagrams can be inconsistent, here is the visual flow of the infra
                                          │ (Signed Request via OAC)
                                          ▼
     ┌──────────────────────────────────────────────────────────────────┐
-    │  ☁️ AWS Cloud                                                    │
+    │  ☁️ AWS Cloud                                                    |
     │                                                                  │
-    │   [ 🔒 S3 Bucket (Private Origin) ] ◀───┐                        │
+    │   [ 🔒 S3 Bucket (Private Origin) ] ◀───┐                       │
     │       (Stores HTML/CSS/JS)              │                        │
     │                                         │ (Sync Files)           │
     └─────────────────────────────────────────┼────────────────────────┘
@@ -182,19 +182,18 @@ _Objective: Use Infrastructure as Code to build the S3 Bucket, CloudFront Distri
 
     - _Note:_ If you get an error about the CloudFront distribution not being ready, wait a few minutes and try again.
 
-    - _Note:_ 4. Verification
-      Once Terraform finishes:
-
-                            Go to the S3 Console. You will see an empty bucket.
-
-                            - **Manual Testing (Optional, if skipping Phase 3):** Upload your `index.html` manually to the S3 bucket (`yourdomain.com`) to test your deployment.
-                            - Visit `https://yourdomain.com` to verify.
 
 5.  **Save Outputs:**
     Once finished, Terraform will output critical values. **Keep this terminal open** or copy these values to a notepad:
     - `github_role_arn`
     - `cloudfront_distribution_id`
     - `s3_bucket_name`
+  
+6.  **Verification:**
+    Once Terraform finishes, go to the AWS S3 Console. You will see an empty bucket created with your domain name.
+    
+    * **Manual Testing (Optional):** If you haven't set up Phase 3 (GitHub Actions) yet, you can manually upload an `index.html` file to this S3 bucket.
+    * Visit `https://yourdomain.com` in your browser to verify the infrastructure works.
 
 ---
 
@@ -268,3 +267,4 @@ _Objective: Push new code changes to trigger the pipeline._
 
 📜 License
 This project is open-source and available under the [MIT License](https://opensource.org/licenses/MIT).
+
